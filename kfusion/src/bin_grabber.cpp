@@ -184,6 +184,7 @@ namespace kfusion {
 
   bool BinSource::setRegistration (bool value) {
     manual_align_ = value;
+	return true;
   }
 
   void BinSource::getParams () {}
