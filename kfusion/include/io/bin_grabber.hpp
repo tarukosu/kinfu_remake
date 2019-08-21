@@ -16,7 +16,17 @@
 #include <fstream>
 
 namespace kfusion {
-class KF_EXPORTS BinSource {
+	class KF_EXPORTS Grabber {
+	public:
+		bool grab(cv::Mat &depth, cv::Mat &image) {
+			return false;
+		}
+		bool setRegistration(bool value = false) {
+			return false;
+		}
+	};
+
+class KF_EXPORTS BinSource : public Grabber {
  public:
   typedef kfusion::PixelRGB RGB24;
   typedef kfusion::RGB RGB32;

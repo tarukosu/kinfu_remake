@@ -5,6 +5,7 @@
 #include <kfusion/kinfu.hpp>
 //#include <io/capture.hpp>
 #include <io/bin_grabber.hpp>
+#include <io/azure_kinect_grabber.hpp>
 
 using namespace kfusion;
 
@@ -37,11 +38,11 @@ struct KinFuApp
    * @brief Constructor of the struct, only taking a BinSource data source
    * @param[in] source, a BinSource from which the frames are grabbed
    */
-  KinFuApp(BinSource& source) : exit_ (false),  interactive_mode_(false), capture_ (source), pause_(false) {
+  KinFuApp(Grabber* source) : exit_ (false),  interactive_mode_(false), capture_ (source), pause_(false) {
       KinFuParams params = KinFuParams::default_params();
       kinfu_ = KinFu::Ptr( new KinFu(params) );
 
-      capture_.setRegistration(true);
+      capture_->setRegistration(true);
 
       cv::viz::WCube cube(cv::Vec3d::all(0), cv::Vec3d(params.volume_size), true, cv::viz::Color::apricot());
       viz.showWidget("cube", cube, params.volume_pose);
@@ -56,10 +57,10 @@ struct KinFuApp
    * @param[in] source, a BinSource from which the frames are grabbed
    * @param[in] params, a KinFuParams struct containing the parameters
    */
-  KinFuApp(BinSource& source, const KinFuParams& params) : exit_ (false),  interactive_mode_(false), capture_ (source), pause_(false) {
+  KinFuApp(Grabber* source, const KinFuParams& params) : exit_ (false),  interactive_mode_(false), capture_ (source), pause_(false) {
     kinfu_ = KinFu::Ptr( new KinFu(params) );
 
-    capture_.setRegistration(true);
+    capture_->setRegistration(true);
 
     cv::viz::WCube cube(cv::Vec3d::all(0), cv::Vec3d(params.volume_size), true, cv::viz::Color::apricot());
     viz.showWidget("cube", cube, params.volume_pose);
@@ -139,7 +140,7 @@ struct KinFuApp
 
       for (int i = 0; !exit_ && !viz.wasStopped(); ++i)
       {
-          bool has_frame = capture_.grab(depth, image);
+          bool has_frame = capture_->grab(depth, image);
           if (!has_frame)
               return std::cout << "Can't grab" << std::endl, false;
 
@@ -187,7 +188,7 @@ struct KinFuApp
   /**< Allow for free point of view (otherwise, follows the camera) */
   bool interactive_mode_;
   /**< Reference to a source of data BinSource */
-  BinSource& capture_;
+  Grabber* capture_;
   /**< Pointer to the instance of kinfu */
   KinFu::Ptr kinfu_;
   /**< */
@@ -219,7 +220,10 @@ int main (int argc, char* argv[])
   if(cuda::checkIfPreFermiGPU(device))
       return std::cout << std::endl << "Kinfu is not supported for pre-Fermi GPU architectures, and not built for them by default. Exiting..." << std::endl, 1;
 
-  BinSource capture(argv[1], argv[2]);
+  //Grabber *grabber = new BinSource(argv[1], argv[2]);
+	  //BinSource capture(argv[1], argv[2]);
+
+  Grabber *grabber = new AzureKinectGrabber();
 
   KinFuParams custom_params = KinFuParams::default_params();
   custom_params.integrate_color = true;
@@ -229,7 +233,7 @@ int main (int argc, char* argv[])
   custom_params.intr = Intr(520.89, 520.23, 324.54, 237.553);
   custom_params.tsdf_trunc_dist = 0.05;
 
-  KinFuApp app (capture, custom_params);
+  KinFuApp app (grabber, custom_params);
 
   // executing
   try { app.execute (); }
