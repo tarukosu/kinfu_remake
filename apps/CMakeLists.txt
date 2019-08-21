@@ -19,6 +19,14 @@ endif(OPENNI_FOUND)
 
 # APP 02: BinGrabber capture
 add_executable(demo_bin demo_bin.cpp)
+
+# Azure Kinect
+include_directories("C:\\Program Files\\Azure Kinect SDK v1.1.1\\sdk\\include")
+set(AZURE_KINECT_LIB
+  "C:\\Program Files\\Azure Kinect SDK v1.1.1\\sdk\\windows-desktop\\amd64\\release\\lib\\k4a.lib"
+)
+target_link_libraries(demo_bin ${AZURE_KINECT_LIB})
+
 target_link_libraries(demo_bin ${OpenCV_LIBS} kfusion)
 
 set_target_properties(demo_bin PROPERTIES

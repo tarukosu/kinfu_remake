@@ -14,6 +14,7 @@ namespace kfusion {
 		{
 			printf("No K4A devices found\n");
 			throw "Azure kinect devices not found";
+			return;
 		}
 
 		if (K4A_RESULT_SUCCEEDED != k4a_device_open(K4A_DEVICE_DEFAULT, &device))
@@ -21,6 +22,7 @@ namespace kfusion {
 			printf("Failed to open device\n");
 			release();
 			throw "Failed to open device";
+			return;
 		}
 
 		// ƒJƒƒ‰‚Ì‰Šúİ’è

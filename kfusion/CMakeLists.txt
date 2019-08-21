@@ -4,6 +4,7 @@ set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "--ftz=true;--prec-div=false;--prec-sqrt=
 set(module_name kfusion)
 set(Includes_srcs
     include/io/bin_grabber.hpp
+    include/io/azure_kinect_grabber.hpp
     include/${module_name}/exports.hpp
     include/${module_name}/kinfu.hpp
     include/${module_name}/types.hpp)
@@ -18,6 +19,7 @@ set(Includes_cuda_srcs
     include/${module_name}/cuda/tsdf_volume.hpp)
 
 set(Source_srcs
+    src/azure_kinect_grabber.cpp
     src/bin_grabber.cpp
     src/color_volume.cpp
     src/core.cpp
@@ -48,6 +50,7 @@ if(OPENNI_FOUND)
 endif(OPENNI_FOUND)
 
 include_directories(include include/kfusion/cuda/ src src/cuda)
+include_directories("C:\\Program Files\\Azure Kinect SDK v1.1.1\\sdk\\include")
 
 set(__has_cuda OFF)
 check_cuda(__has_cuda)
