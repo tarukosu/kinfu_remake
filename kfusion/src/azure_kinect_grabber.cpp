@@ -92,6 +92,36 @@ namespace kfusion {
 	#include <vector>
 	*/
 
+	bool transform_depth_to_color(k4a_transformation_t transformation_handle,
+		const k4a_image_t depth_image,
+		const k4a_image_t color_image,
+		k4a_image_t& transformed_depth_image)
+	{
+		// transform color image into depth camera geometry
+		int color_image_width_pixels = k4a_image_get_width_pixels(color_image);
+		int color_image_height_pixels = k4a_image_get_height_pixels(color_image);
+
+		if (K4A_RESULT_SUCCEEDED != k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16,
+			color_image_width_pixels,
+			color_image_height_pixels,
+			color_image_width_pixels * (int)sizeof(uint16_t),
+			&transformed_depth_image))
+		{
+			printf("Failed to create transformed depth image\n");
+			return false;
+		}
+
+		if (K4A_RESULT_SUCCEEDED !=
+			k4a_transformation_depth_image_to_color_camera(transformation_handle, depth_image, transformed_depth_image))
+		{
+			printf("Failed to compute transformed depth image\n");
+			return false;
+		}
+		return true;
+	}
+
+
+
 	bool point_cloud_image_depth_to_color(k4a_transformation_t transformation_handle,
 		const k4a_image_t depth_image,
 		const k4a_image_t color_image,
@@ -261,7 +291,13 @@ namespace kfusion {
 			return false;
 		}
 
-		if (point_cloud_image_depth_to_color(transformation, depth_image, color_image, point_cloud_image) == false)
+		// k4a_image_t transformed_depth_image = nullptr;
+
+		if (transformed_depth_image != nullptr) {
+			k4a_image_release(transformed_depth_image);
+		}
+
+		if (transform_depth_to_color(transformation, depth_image, color_image, transformed_depth_image) == false)
 		{
 			return false;
 		}
@@ -271,8 +307,28 @@ namespace kfusion {
 		width = k4a_image_get_width_pixels(color_image);
 		height = k4a_image_get_height_pixels(color_image);
 
-		color_mat = cv::Mat(height, width, CV_8UC4, color_image_data);
-		cv::imshow("color", color_mat);
-		cv::waitKey(33);
+		image = cv::Mat(height, width, CV_8UC4, color_image_data);
+		cv::imshow("color", image);
+
+		/*
+		k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, width, height, width * (int)sizeof(uint16_t),
+			&transformed_depth_image);
+*/
+		auto a = k4a_image_get_width_pixels(transformed_depth_image);
+
+		depth = cv::Mat(height, width, CV_16UC1, k4a_image_get_buffer(transformed_depth_image));// .clone();
+
+
+		//depth = cv::Mat(height, width, CV_16UC1);
+		//cv::imshow("depth", depth);
+		//cv::waitKey(33);
+
+		//k4a_image_release(transformed_depth_image);
+		k4a_image_release(color_image);
+		k4a_image_release(depth_image);
+		//k4a_image_release(transformed_depth_image);
+		k4a_capture_release(capture);
+
+		return true;
 	}
 }

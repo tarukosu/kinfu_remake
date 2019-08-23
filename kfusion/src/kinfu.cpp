@@ -11,7 +11,7 @@ kfusion::KinFuParams kfusion::KinFuParams::default_params()
 {
     const int iters[] = {10, 5, 4, 0};
     const int levels = sizeof(iters)/sizeof(iters[0]);
-
+	
     KinFuParams p;
 
     p.cols = 640;  //pixels
@@ -214,8 +214,10 @@ bool kfusion::KinFu::operator()(const kfusion::cuda::Depth& depth, const kfusion
 #else
         bool ok = icp_->estimateTransform(affine, p.intr, curr_.points_pyr, curr_.normals_pyr, prev_.points_pyr, prev_.normals_pyr);
 #endif
-        if (!ok)
-            return reset(), false;
+
+		if (!ok) {
+			return reset(), false;
+		}
     }
 
     poses_.push_back(poses_.back() * affine); // curr -> global
@@ -241,7 +243,7 @@ bool kfusion::KinFu::operator()(const kfusion::cuda::Depth& depth, const kfusion
     {
         //ScopeTime time("ray-cast-all");
 #if defined USE_DEPTH
-        volume_->raycast(poses_.back(), p.intr, prev_.depth_pyr[0], prev_.normals_pyr[0]);
+		tsdf_volume_->raycast(poses_.back(), p.intr, prev_.depth_pyr[0], prev_.normals_pyr[0]);
         for (int i = 1; i < LEVELS; ++i)
             resizeDepthNormals(prev_.depth_pyr[i-1], prev_.normals_pyr[i-1], prev_.depth_pyr[i], prev_.normals_pyr[i]);
 #else

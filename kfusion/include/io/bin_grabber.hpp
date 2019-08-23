@@ -18,10 +18,10 @@
 namespace kfusion {
 	class KF_EXPORTS Grabber {
 	public:
-		bool grab(cv::Mat &depth, cv::Mat &image) {
+		virtual bool grab(cv::Mat &depth, cv::Mat &image) {
 			return false;
 		}
-		bool setRegistration(bool value = false) {
+		virtual bool setRegistration(bool value = false) {
 			return false;
 		}
 	};

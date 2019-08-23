@@ -226,13 +226,16 @@ int main (int argc, char* argv[])
   Grabber *grabber = new AzureKinectGrabber();
 
   KinFuParams custom_params = KinFuParams::default_params();
+  custom_params.cols = 1280;
+  custom_params.rows = 720;
   custom_params.integrate_color = true;
+  /*
   custom_params.volume_dims = Vec3i::all(256);
   custom_params.volume_size = Vec3f::all(0.7f);
   custom_params.volume_pose = Affine3f().translate(Vec3f(-custom_params.volume_size[0]/2, -custom_params.volume_size[1]/2, 0.5f));
   custom_params.intr = Intr(520.89, 520.23, 324.54, 237.553);
   custom_params.tsdf_trunc_dist = 0.05;
-
+  */
   KinFuApp app (grabber, custom_params);
 
   // executing

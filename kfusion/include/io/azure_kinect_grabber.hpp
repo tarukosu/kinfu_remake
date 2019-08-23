@@ -39,6 +39,7 @@ namespace kfusion {
 		int point_count = 0;
 
 		k4a_image_t point_cloud_image = NULL;
+		k4a_image_t transformed_depth_image = NULL;
 
 		uint8_t* color_image_data = NULL;
 
